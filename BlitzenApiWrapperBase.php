@@ -1,24 +1,40 @@
 <?php
-
-/* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/* Blitzen
+ * Jordan Clark 2015
  */
 class BlitzenApiWrapperBase {
-    protected $apiKey;
-    protected $subdomain;
-    protected $domain = 'blitzen.com';
-    protected $client_id;
-    protected $client_secret;
-    protected $access_token;
+    //Testing URLs
+    //protected $auth_url = 'http://localhost:8000/v1/o/token/';
+    protected $auth_url = 'http://blitzen.blitzen.localhost/api/v1/o/token/';
+    //protected $auth_url = 'https://blitzen.com/v1/o/token/';
     
-    public function __construct(){
-        $this->auth_url = 'http://localhost:8000/v1/o/token/';
+    public function __construct($client_id, $client_secret, $subdomain = Null, $access_token = Null, $refresh_token = Null){
+        $this->client_id = $client_id;
+        $this->client_secret = $client_secret;
+        $this->access_token = $access_token;
+        $this->refresh_token = $refresh_token;
+        $this->subdomain = $subdomain;
     }
     
-    public function getFullUrl(){
-        return "https://$subdomain.$domain/api/v1/";
+    public function getFullUrl($url){
+        //Testing URL
+        return "http://blitzen.blitzen.localhost/api/v1/$url/";
+        //return "http://localhost:8000/v1/$url/";
+        //return "https://$this->subdomain.$this->domain/api/v1/$url";
+        
+    }
+
+    public function getHelper($url){
+      $this->curl = new BlitzenCurl();
+      return $this->curl->getAuthenticated($url, $this->access_token);
+    }
+
+    public function authenticate($username, $password){
+      $this->curl = new BlitzenCurl();
+      $response = $this->curl->authenticate($this->auth_url, $this->client_id, $this->client_secret, $username, $password);
+      $this->access_token = $response->access_token;
+      $this->refresh_token = $response->refresh_token;
+      return $response;
     }
     
 }
@@ -28,19 +44,22 @@ class BlitzenCurl {
         
     }
     
-    public function authenticate($client_id, $client_secret, $username, $password){
-        $full_url = $this->auth_url . "?grant_type=password&username=$username&password=$password";
+    public function authenticate($auth_url, $client_id, $client_secret, $username, $password){
+        $full_url = "$auth_url?grant_type=password&username=$username&password=$password";
         $this->curl = \curl_init($full_url);
         curl_setopt($this->curl, CURLOPT_USERPWD, "$client_id:$client_secret");
+        curl_setopt($this->curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($this->curl, CURLOPT_POST, true);
         $response = curl_exec($this->curl);
-        echo $response;
+        $json_response = json_decode($response);
+        curl_close($this->curl);
+        return $json_response;
     }
     
     public function getAuthenticated($url, $access_token){
         $this->curl = \curl_init($url);
         $this->setBasicCurlOptions($access_token);
-
-        $response = curl_exec($this->curl);
+        $response = json_decode(curl_exec($this->curl));
         $this->setResultCodes();
         $this->checkForCurlErrors();
         $this->checkForGetErrors($response);
@@ -90,7 +109,7 @@ class BlitzenCurl {
                 //ignore, this is good.
                 break;
             case 401:
-                throw new Exception('(401) Forbidden.  Check your API key.', 401);
+                throw new Exception("(401) Forbidden.  $response->error", 401);
                 break;
             default:
                 $this->throwResponseError($response);
@@ -107,6 +126,4 @@ class BlitzenCurl {
         }
         return $response;
     }
-    
 }
-
