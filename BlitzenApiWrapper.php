@@ -5,7 +5,7 @@
 require_once('BlitzenApiWrapperBase.php');
 
 class BlitzenApiWrapper extends BlitzenApiWrapperBase {
-  public function __construct($client_id, $client_secret, $subdomain, $access_token, $refresh_token){
+  public function __construct($client_id, $client_secret, $subdomain = Null, $access_token = Null, $refresh_token = Null){
     parent::__construct($client_id, $client_secret, $subdomain, $access_token, $refresh_token);
   }
   
@@ -22,7 +22,15 @@ class BlitzenApiWrapper extends BlitzenApiWrapperBase {
   }
   
   public function getFormFields($formId){
-      return $this->getHelper($this->getFullUrl("forms/$formId/fields"));
+      return $this->getHelper($this->getFullUrl("forms/$formId/field"));
+  }
+  
+  public function getSubmissions($formId){
+      return $this->getHelper($this->getFullUrl("forms/$formId/submission"));
+  }
+  
+  public function getSubmission($formId, $submissionId){
+      return $this->getHelper($this->getFullUrl("forms/$formId/submission/$submissionId"));
   }
   
   public function getUserStats(){

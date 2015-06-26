@@ -16,11 +16,14 @@
 
 <?php
     $forms = $wrapper->getForms();
+    $formFields = $wrapper->getFormFields('b64535b934404c1199a6c917e23cf5');
     $notifications = $wrapper->getNotifications();
     $contacts = $wrapper->getContacts();
     $users = $wrapper->getUsers();
     echo "</br></br>Forms:";
     var_dump($forms);
+    echo "</br></br>Form Fields:";
+    var_dump($formFields);
     echo "</br></br>Notifications:";
     var_dump($notifications);
     echo "</br></br>Contacts:";

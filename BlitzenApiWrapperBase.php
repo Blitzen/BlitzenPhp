@@ -23,17 +23,38 @@ class BlitzenApiWrapperBase {
         //return "https://$this->subdomain.$this->domain/api/v1/$url";
         
     }
+    
+    public function refreshToken(){
+        $params = array(
+            'refresh_token' => $this->refresh_token,
+            'client_id' => $this->client_id,
+            'client_secret' => $this->client_secret,
+            'grant_type' => 'refresh_token'
+        );
+        $this->curl = new BlitzenCurl();
+        $response = $this->curl->postAuthenticated($params, $this->auth_url);
+        $decoded = json_decode($response);
+        $this->access_token = $decoded->access_token;
+        $this->refresh_token = $decoded->refresh_token;
+        return $response;
+    }
 
     public function getHelper($url){
       $this->curl = new BlitzenCurl();
       return $this->curl->getAuthenticated($url, $this->access_token);
     }
+    
+    public function postHelper($url, $params){
+        $this->curl = new BlitzenCurl();
+        return $this->curl->postAuthenticated($params, $url, $this->access_token);
+    }
 
     public function authenticate($username, $password){
       $this->curl = new BlitzenCurl();
       $response = $this->curl->authenticate($this->auth_url, $this->client_id, $this->client_secret, $username, $password);
-      $this->access_token = $response->access_token;
-      $this->refresh_token = $response->refresh_token;
+      $decoded = json_decode($response);
+      $this->access_token = $decoded->access_token;
+      $this->refresh_token = $decoded->refresh_token;
       return $response;
     }
     
@@ -51,18 +72,17 @@ class BlitzenCurl {
         curl_setopt($this->curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($this->curl, CURLOPT_POST, true);
         $response = curl_exec($this->curl);
-        $json_response = json_decode($response);
         curl_close($this->curl);
-        return $json_response;
+        return $response;
     }
     
     public function getAuthenticated($url, $access_token){
         $this->curl = \curl_init($url);
         $this->setBasicCurlOptions($access_token);
-        $response = json_decode(curl_exec($this->curl));
+        $response = curl_exec($this->curl);
         $this->setResultCodes();
         $this->checkForCurlErrors();
-        $this->checkForGetErrors($response);
+        $this->checkForErrors($response);
         curl_close($this->curl);
         return $response;
     }
@@ -78,7 +98,7 @@ class BlitzenCurl {
         $response = curl_exec($this->curl);
         $this->setResultCodes();
         $this->checkForCurlErrors();
-        $this->checkForPostErrors($response);
+        $this->checkForErrors($response);
         curl_close($this->curl);
         return $response;
     }
@@ -103,7 +123,7 @@ class BlitzenCurl {
         }
     }
     
-    private function checkForGetErrors($response) {
+    private function checkForErrors($response) {
         switch ($this->ResultStatus['http_code']) {
             case 200:
                 //ignore, this is good.
@@ -118,9 +138,9 @@ class BlitzenCurl {
     }
     
     private function throwResponseError($response) {
+        $response = json_decode($response);
         if ($response) {
-            $obj = json_decode($response);
-            throw new Exception('('.$obj->HTTPCode.') '.$obj->Text, $this->ResultStatus['HTTP_CODE']);
+            throw new Exception('('.$response->HTTPCode.') '.$response->Text, $this->ResultStatus['HTTP_CODE']);
         } else {
             throw new Exception('(500) Internal server error.  Please contact support@blitzen.com', 500);
         }
