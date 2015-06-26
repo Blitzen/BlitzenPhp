@@ -2,23 +2,18 @@
     "docs": [
         {
             "location": "/", 
-            "text": "Welcome to MkDocs\n\n\nFor full documentation visit \nmkdocs.org\n.\n\n\nCommands\n\n\n\n\nmkdocs new [dir-name]\n - Create a new project.\n\n\nmkdocs serve\n - Start the live-reloading docs server.\n\n\nmkdocs build\n - Build the documentation site.\n\n\nmkdocs help\n - Print this help message.\n\n\n\n\nProject layout\n\n\nmkdocs.yml    # The configuration file.\ndocs/\n    index.md  # The documentation homepage.\n    ...       # Other markdown pages, images and other files.", 
+            "text": "Blitzen PHP\n\n\nInstall:\nClone \nhttps://github.com/Blitzen/BlitzenPhp.git\n\n\nApply for a client_id and client_secret at https://blitzen.com/api/v1/o/applications/\n\n\nInitialize the wrapper:\n\n\n$wrapper = new BlitzenApiWrapper($client_id, $client_secret, $subdomain)\n\n\nIf you already have an access_token and a refresh_token just pass them in on the initialization\n\n\n$wrapper = new BlitzenApiWrapper($client_id, $client_secret, $subdomain, $access_token, $refresh_token)\n\n\nIf you don't just authenticate and the tokens will be generated:\n\n\n$wrapper-\nauthenticate($username, $password)\n\n\nGetting information:\n\n\nForms:\n\n\n$wrapper-\ngetForms()\n\n\nNotifications:\n\n\n$wrapper-\ngetNotifications()\n\n\nContacts:\n\n\n$wrapper-\ngetContacts()\n\n\nUsers:\n\n\n$wrapper-\ngetUsers()", 
             "title": "Home"
         }, 
         {
-            "location": "/#welcome-to-mkdocs", 
-            "text": "For full documentation visit  mkdocs.org .", 
-            "title": "Welcome to MkDocs"
+            "location": "/#blitzen-php", 
+            "text": "Install:\nClone  https://github.com/Blitzen/BlitzenPhp.git  Apply for a client_id and client_secret at https://blitzen.com/api/v1/o/applications/  Initialize the wrapper:  $wrapper = new BlitzenApiWrapper($client_id, $client_secret, $subdomain)  If you already have an access_token and a refresh_token just pass them in on the initialization  $wrapper = new BlitzenApiWrapper($client_id, $client_secret, $subdomain, $access_token, $refresh_token)  If you don't just authenticate and the tokens will be generated:  $wrapper- authenticate($username, $password)", 
+            "title": "Blitzen PHP"
         }, 
         {
-            "location": "/#commands", 
-            "text": "mkdocs new [dir-name]  - Create a new project.  mkdocs serve  - Start the live-reloading docs server.  mkdocs build  - Build the documentation site.  mkdocs help  - Print this help message.", 
-            "title": "Commands"
-        }, 
-        {
-            "location": "/#project-layout", 
-            "text": "mkdocs.yml    # The configuration file.\ndocs/\n    index.md  # The documentation homepage.\n    ...       # Other markdown pages, images and other files.", 
-            "title": "Project layout"
+            "location": "/#getting-information", 
+            "text": "Forms:  $wrapper- getForms()  Notifications:  $wrapper- getNotifications()  Contacts:  $wrapper- getContacts()  Users:  $wrapper- getUsers()", 
+            "title": "Getting information:"
         }
     ]
 }
