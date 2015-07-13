@@ -5,8 +5,8 @@
 class BlitzenApiWrapperBase {
     //Testing URLs
     //protected $auth_url = 'http://localhost:8000/v1/o/token/';
-    protected $auth_url = 'http://blitzen.blitzen.localhost/api/v1/o/token/';
-    //protected $auth_url = 'https://blitzen.com/v1/o/token/';
+    //protected $auth_url = 'http://blitzen.blitzen.localhost/api/v1/o/token/';
+    protected $auth_url = 'https://blitzen.com/api/v1/o/token/';
     
     public function __construct($client_id, $client_secret, $subdomain = Null, $access_token = Null, $refresh_token = Null){
         $this->client_id = $client_id;
@@ -18,9 +18,9 @@ class BlitzenApiWrapperBase {
     
     public function getFullUrl($url){
         //Testing URL
-        return "http://blitzen.blitzen.localhost/api/v1/$url/";
+        //return "http://blitzen.blitzen.localhost/api/v1/$url/";
         //return "http://localhost:8000/v1/$url/";
-        //return "https://$this->subdomain.$this->domain/api/v1/$url";
+        return "https://$this->subdomain.$this->domain/api/v1/$url";
         
     }
     
@@ -39,14 +39,31 @@ class BlitzenApiWrapperBase {
         return $response;
     }
 
-    public function getHelper($url){
-      $this->curl = new BlitzenCurl();
-      return $this->curl->getAuthenticated($url, $this->access_token);
+    public function getHelper($url, $refreshed = False){
+      try{
+        $this->curl = new BlitzenCurl();
+        $response = $this->curl->getAuthenticated($url, $this->access_token);
+      } catch (Exception $ex) {
+        if($refreshed === False){
+          $this->refreshToken();
+          $response = $this->getHelper($url, True);
+        }
+      }
+      return $response;
+      
     }
     
-    public function postHelper($url, $params){
-        $this->curl = new BlitzenCurl();
-        return $this->curl->postAuthenticated($params, $url, $this->access_token);
+    public function postHelper($url, $params, $refreshed = False){
+        try{
+            $this->curl = new BlitzenCurl();
+            $response = $this->curl->postAuthenticated($params, $url, $this->access_token);
+        } catch (Exception $ex) {
+          if($refreshed === False){
+              $this->refreshToken();
+              $response = $this->postHelper($url, $params, True);
+          }
+        }
+        return $response;
     }
 
     public function authenticate($username, $password){
