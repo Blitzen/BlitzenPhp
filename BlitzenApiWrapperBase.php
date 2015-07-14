@@ -3,9 +3,6 @@
  * Jordan Clark 2015
  */
 class BlitzenApiWrapperBase {
-    //Testing URLs
-    //protected $auth_url = 'http://localhost:8000/v1/o/token/';
-    //protected $auth_url = 'http://blitzen.blitzen.localhost/api/v1/o/token/';
     protected $auth_url = 'https://blitzen.com/api/v1/o/token/';
     
     public function __construct($client_id, $client_secret, $subdomain = Null, $access_token = Null, $refresh_token = Null){
@@ -17,11 +14,7 @@ class BlitzenApiWrapperBase {
     }
     
     public function getFullUrl($url){
-        //Testing URL
-        //return "http://blitzen.blitzen.localhost/api/v1/$url/";
-        //return "http://localhost:8000/v1/$url/";
-        return "https://$this->subdomain.$this->domain/api/v1/$url";
-        
+        return "https://$this->subdomain.blitzen.com/api/v1/$url";
     }
     
     public function refreshToken(){
@@ -88,6 +81,7 @@ class BlitzenCurl {
         curl_setopt($this->curl, CURLOPT_USERPWD, "$client_id:$client_secret");
         curl_setopt($this->curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($this->curl, CURLOPT_POST, true);
+        curl_setopt($this->curl, CURLOPT_SSL_VERIFYPEER, true);
         $response = curl_exec($this->curl);
         curl_close($this->curl);
         return $response;
@@ -121,9 +115,9 @@ class BlitzenCurl {
     }
     
     public function setBasicCurlOptions($access_token) {
-        curl_setopt($this->curl, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($this->curl, CURLOPT_SSL_VERIFYHOST, true);
         curl_setopt($this->curl, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($this->curl, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($this->curl, CURLOPT_SSL_VERIFYPEER, true);
         curl_setopt($this->curl, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($this->curl, CURLOPT_USERAGENT, 'Blitzen API Wrapper');
         curl_setopt($this->curl, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
