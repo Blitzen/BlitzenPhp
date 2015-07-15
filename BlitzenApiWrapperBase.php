@@ -76,12 +76,15 @@ class BlitzenCurl {
     }
     
     public function authenticate($auth_url, $client_id, $client_secret, $username, $password){
-        $full_url = "$auth_url?grant_type=password&username=$username&password=$password";
+        $full_url = "$auth_url?grant_type=password";
+        $postParams = Array("username"=>$username,
+                            "password"=>$password);
         $this->curl = \curl_init($full_url);
         curl_setopt($this->curl, CURLOPT_USERPWD, "$client_id:$client_secret");
         curl_setopt($this->curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($this->curl, CURLOPT_POST, true);
         curl_setopt($this->curl, CURLOPT_SSL_VERIFYPEER, true);
+        curl_setopt($this->curl, CURLOPT_POSTFIELDS, $postParams);
         $response = curl_exec($this->curl);
         curl_close($this->curl);
         return $response;
