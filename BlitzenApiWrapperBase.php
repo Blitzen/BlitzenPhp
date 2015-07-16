@@ -86,6 +86,9 @@ class BlitzenCurl {
         curl_setopt($this->curl, CURLOPT_SSL_VERIFYPEER, true);
         curl_setopt($this->curl, CURLOPT_POSTFIELDS, $postParams);
         $response = curl_exec($this->curl);
+        $this->setResultCodes();
+        $this->checkForCurlErrors();
+        $this->checkForErrors($response);
         curl_close($this->curl);
         return $response;
     }
@@ -101,11 +104,11 @@ class BlitzenCurl {
         return $response;
     }
     
-    public function postAuthenticated($postParams, $url, $access_token) {
+    public function postAuthenticated($postParams, $url, $access_token=null) {
         $this->curl = curl_init($url); 
         $this->setBasicCurlOptions($access_token);
 
-        curl_setopt($this->curl, CURLOPT_HTTPHEADER, array('Content-type: multipart/form-data', 'Expect:'));
+        curl_setopt($this->curl, CURLOPT_HTTPHEADER, array('Content-type: multipart/form-data'));
         curl_setopt($this->curl, CURLOPT_POST, true);
         curl_setopt($this->curl, CURLOPT_POSTFIELDS, $postParams);
 
@@ -118,13 +121,15 @@ class BlitzenCurl {
     }
     
     public function setBasicCurlOptions($access_token) {
-        curl_setopt($this->curl, CURLOPT_SSL_VERIFYHOST, true);
+        curl_setopt($this->curl, CURLOPT_SSL_VERIFYHOST, false);
         curl_setopt($this->curl, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($this->curl, CURLOPT_SSL_VERIFYPEER, true);
         curl_setopt($this->curl, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($this->curl, CURLOPT_USERAGENT, 'Blitzen API Wrapper');
         curl_setopt($this->curl, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
-        curl_setopt($this->curl, CURLOPT_HTTPHEADER, array("Authorization: Bearer $access_token"));
+        if($access_token !== null){
+            curl_setopt($this->curl, CURLOPT_HTTPHEADER, array("Authorization: Bearer $access_token"));
+        }
     }
     
     private function setResultCodes() {
